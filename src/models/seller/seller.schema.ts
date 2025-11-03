@@ -1,7 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Types } from 'mongoose';
 
 @Schema({ timestamps: true, discriminatorKey: 'role', virtuals: true })
 export class Seller {
+  readonly _id: Types.ObjectId;
   userName: string;
   email: string;
   password: string;
