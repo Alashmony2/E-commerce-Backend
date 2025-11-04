@@ -1,12 +1,7 @@
 import { Module } from '@nestjs/common';
-import {
-  AdminRepository,
-  CustomerRepository,
-  SellerRepository
-} from 'src/models';
-import { UserMongoModule } from 'src/shared';
 import { ProductController } from './product.controller';
 import { ProductService } from './product.service';
+import { UserMongoModule } from '@shared/index';
 
 @Module({
   imports:[
