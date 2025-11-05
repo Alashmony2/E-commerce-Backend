@@ -8,8 +8,8 @@ export class AbstractRepository<T> {
   }
   public async getOne(
     filter: RootFilterQuery<T>,
-    projection: ProjectionType<T>,
-    options: QueryOptions,
+    projection?: ProjectionType<T>,
+    options?: QueryOptions,
   ) {
     return this.model.findOne(filter, projection, options);
   }

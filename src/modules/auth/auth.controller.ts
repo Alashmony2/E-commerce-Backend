@@ -11,5 +11,13 @@ export class AuthController {
   ) {}
 
   @Post('/register')
-  register(@Body() registerDTO: RegisterDTO) {}
+  async register(@Body() registerDTO: RegisterDTO) {
+    const customer = await this.authFactoryService.createCustomer(registerDTO);
+    const createdCustomer = await this.authService.register(customer);
+    return {
+      message: 'Customer created successfully',
+      success: true,
+      data: createdCustomer,
+    };
+  }
 }
