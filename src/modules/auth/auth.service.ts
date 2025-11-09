@@ -1,9 +1,9 @@
 import {
   ConflictException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { RegisterDTO } from './dto/register.dto';
 import { Customer } from './entities/auth.entity';
 import { CustomerRepository } from '@models/index';
 import { sendMail } from '@common/helpers';
@@ -11,6 +11,7 @@ import { LoginDTO } from './dto/login.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { ConfirmEmailDTO } from './dto/confirmEmail.dto';
 
 @Injectable()
 export class AuthService {
@@ -37,6 +38,23 @@ export class AuthService {
     return customerObj as Customer;
   }
 
+  async confirmEmail(confirmEmailDTO: ConfirmEmailDTO) {
+    const customerExist = await this.customerRepository.getOne({
+      email: confirmEmailDTO.email,
+    });
+    if (!customerExist) throw new NotFoundException('Customer not found');
+    if (customerExist.otp !== confirmEmailDTO.otp)
+      throw new UnauthorizedException('Invalid otp');
+    if (customerExist.otpExpiry < new Date())
+      throw new UnauthorizedException('Otp expired');
+    customerExist.isVerified = true;
+    await this.customerRepository.update(
+      { _id: customerExist._id },
+      { isVerified: true },
+    );
+    return customerExist;
+  }
+
   async login(loginDTO: LoginDTO) {
     const customerExist = await this.customerRepository.getOne({
       email: loginDTO.email,
@@ -47,6 +65,7 @@ export class AuthService {
     );
     if (!customerExist) throw new UnauthorizedException('Invalid credentials');
     if (!match) throw new UnauthorizedException('Invalid credentials');
+    if (!customerExist.isVerified) throw new UnauthorizedException('Email not verified');
     //generate token
     const token = this.jwtService.sign(
       {

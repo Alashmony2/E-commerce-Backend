@@ -4,6 +4,7 @@ import { RegisterDTO } from './dto/register.dto';
 import { AuthFactoryService } from './factory/index';
 import { LoginDTO } from './dto/login.dto';
 import { success } from 'zod';
+import { ConfirmEmailDTO } from './dto/confirmEmail.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -20,6 +21,15 @@ export class AuthController {
       message: 'Customer created successfully',
       success: true,
       data: createdCustomer,
+    };
+  }
+  @Post('confirm-email')
+  async confirmEmail(@Body() confirmEmailDTO: ConfirmEmailDTO) {
+    const customer = await this.authService.confirmEmail(confirmEmailDTO);
+    return {
+      message: 'Email confirmed successfully',
+      success: true,
+      data: customer,
     };
   }
 
