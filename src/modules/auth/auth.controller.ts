@@ -6,6 +6,7 @@ import { LoginDTO } from './dto/login.dto';
 import { ConfirmEmailDTO } from './dto/confirmEmail.dto';
 import { ForgetPasswordDTO } from './dto/forgetPassword.dto';
 import { ResetPasswordDTO } from './dto/resetPassword.dto';
+import { GoogleAuthDTO } from './dto/google-auth.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -43,13 +44,32 @@ export class AuthController {
   @Post('forget-password')
   async forgetPassword(@Body() forgetPasswordDTO: ForgetPasswordDTO) {
     const customer = await this.authService.forgetPassword(forgetPasswordDTO);
-    return { message: 'otp send successfully', success: true, data: { customer } };
+    return {
+      message: 'otp send successfully',
+      success: true,
+      data: { customer },
+    };
   }
 
   @Post('reset-password')
   async resetPassword(@Body() resetPasswordDTO: ResetPasswordDTO) {
     const token = await this.authService.resetPassword(resetPasswordDTO);
-    return { message: 'Password reseted successfully', success: true, data: { token } };
+    return {
+      message: 'Password reseted successfully',
+      success: true,
+      data: { token },
+    };
   }
 
+  @Post('google-register')
+  async googleRegister(@Body() googleAuthDTO: GoogleAuthDTO) {
+    const { token, customer } = await this.authService.googleRegister(
+      googleAuthDTO.idToken,
+    );
+    return {
+      message: 'Registered with Google successfully',
+      success: true,
+      data: { token, customer },
+    };
+  }
 }

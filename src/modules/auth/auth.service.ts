@@ -14,14 +14,18 @@ import { ConfigService } from '@nestjs/config';
 import { ConfirmEmailDTO } from './dto/confirmEmail.dto';
 import { ForgetPasswordDTO } from './dto/forgetPassword.dto';
 import { ResetPasswordDTO } from './dto/resetPassword.dto';
+import { OAuth2Client } from 'google-auth-library';
 
 @Injectable()
 export class AuthService {
+  private readonly googleClient: OAuth2Client;
   constructor(
     private readonly configService: ConfigService,
     private readonly customerRepository: CustomerRepository,
     private readonly jwtService: JwtService,
-  ) {}
+  ) {
+    this.googleClient = new OAuth2Client(this.configService.get('google_id'));
+  }
   async register(customer: Customer) {
     const customerExist = await this.customerRepository.getOne({
       email: customer.email,
@@ -100,6 +104,7 @@ export class AuthService {
     });
     return customerExist;
   }
+
   async resetPassword(resetPassword: ResetPasswordDTO) {
     const customerExist = await this.customerRepository.getOne({
       email: resetPassword.email,
@@ -128,5 +133,41 @@ export class AuthService {
       { secret: this.configService.get('access').jwt_secret, expiresIn: '1d' },
     );
     return token;
+  }
+
+  async googleRegister(idToken: string) {
+    const ticket = await this.googleClient.verifyIdToken({
+      idToken,
+      audience: this.configService.get('google_id'),
+    });
+    const payload = ticket.getPayload();
+
+    if (!payload || !payload.email) {
+      throw new UnauthorizedException('Invalid Google token');
+    }
+
+    const customerExist = await this.customerRepository.getOne({
+      email: payload.email,
+    });
+    if (customerExist) {
+      throw new ConflictException('User already exists. Please login');
+    }
+
+    const newCustomer: Partial<Customer> = {
+      email: payload.email,
+      userName: payload.name,
+      isVerified: true,
+      password: undefined,
+    };
+
+    const customerDoc = await this.customerRepository.create(newCustomer);
+    const customer = customerDoc.toObject();
+
+    const token = this.jwtService.sign(
+      { _id: customer._id, role: 'Customer', email: customer.email },
+      { secret: this.configService.get('access').jwt_secret, expiresIn: '1d' },
+    );
+
+    return { token, customer };
   }
 }
