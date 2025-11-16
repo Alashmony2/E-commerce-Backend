@@ -11,13 +11,13 @@ import {
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { User } from '@common/decorators';
+import { Roles, User } from '@common/decorators';
 import { CategoryFactoryService } from './factory';
-import { success } from 'zod';
-import { AuthGuard } from '@common/guards';
+import { AuthGuard, RolesGuard } from '@common/guards';
 
 @Controller('category')
-@UseGuards(AuthGuard)
+@Roles(['Admin'])
+@UseGuards(AuthGuard, RolesGuard)
 export class CategoryController {
   constructor(
     private readonly categoryService: CategoryService,
