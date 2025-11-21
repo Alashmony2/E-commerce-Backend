@@ -1,4 +1,8 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Category } from './entities/category.entity';
 import { CategoryRepository } from '@models/index';
 
@@ -17,8 +21,10 @@ export class CategoryService {
     return `This action returns all category`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} category`;
+  async findOne(id: string) {
+    const category = await this.categoryRepository.getOne({ _id: id }, {}, {populate: [{path: 'createdBy'}, {path: 'updatedBy'}]});
+    if (!category) throw new NotFoundException('Category not found');
+    return category;
   }
 
   async update(id: string, category: Category) {

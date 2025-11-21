@@ -12,13 +12,13 @@ export class RolesGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
+    const publicVal = this.reflector.get('PUBLIC', context.getHandler());
+    if (publicVal) return true;
     const request = context.switchToHttp().getRequest();
     const roles = this.reflector.getAllAndMerge(ROLES, [
       context.getHandler(),
       context.getClass(),
     ]);
-    const publicVal = this.reflector.get('PUBLIC', context.getHandler());
-    if (publicVal) return true;
     if (!roles.includes(request.user.role))
       throw new UnauthorizedException('You are not allowed');
     return true;

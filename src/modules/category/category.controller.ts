@@ -1,4 +1,4 @@
-import { Auth, User } from '@common/decorators';
+import { Auth, Public, User } from '@common/decorators';
 import {
   Body,
   Controller,
@@ -44,9 +44,14 @@ export class CategoryController {
     return this.categoryService.findAll();
   }
 
+  @Public()
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.categoryService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    const category = await this.categoryService.findOne(id);
+    return {
+      success: true,
+      data: category,
+    };
   }
 
   @Put(':id')
