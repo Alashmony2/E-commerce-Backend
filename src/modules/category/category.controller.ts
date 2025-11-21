@@ -6,7 +6,8 @@ import {
   Get,
   Param,
   Patch,
-  Post
+  Post,
+  Put,
 } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
@@ -48,12 +49,21 @@ export class CategoryController {
     return this.categoryService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(
+  @Put(':id')
+  async update(
     @Param('id') id: string,
     @Body() updateCategoryDto: UpdateCategoryDto,
   ) {
-    return this.categoryService.update(+id, updateCategoryDto);
+    const category = await this.categoryFactoryService.updateCategory(
+      id,
+      updateCategoryDto,
+    );
+    const updatedCategory = await this.categoryService.update(id, category);
+    return {
+      success: true,
+      message: 'Category updated successfully',
+      data: updatedCategory,
+    };
   }
 
   @Delete(':id')
