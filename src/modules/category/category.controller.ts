@@ -53,10 +53,12 @@ export class CategoryController {
   async update(
     @Param('id') id: string,
     @Body() updateCategoryDto: UpdateCategoryDto,
+    @User() user: any,
   ) {
     const category = await this.categoryFactoryService.updateCategory(
       id,
       updateCategoryDto,
+      user,
     );
     const updatedCategory = await this.categoryService.update(id, category);
     return {

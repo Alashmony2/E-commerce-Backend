@@ -22,7 +22,10 @@ export class CategoryService {
   }
 
   async update(id: string, category: Category) {
-    const categoryExist = await this.categoryRepository.getOne({ slug: category.slug });
+    const categoryExist = await this.categoryRepository.getOne({
+      slug: category.slug,
+      _id: { $ne: id },
+    });
     if (categoryExist) throw new ConflictException('Category already exist');
     return await this.categoryRepository.update({ _id: id }, category, {
       new: true,

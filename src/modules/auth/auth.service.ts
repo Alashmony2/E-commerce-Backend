@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Customer } from './entities/auth.entity';
-import { CustomerRepository } from '@models/index';
+import { CustomerRepository, UserRepository } from '@models/index';
 import { generateOTP, sendMail } from '@common/helpers';
 import { LoginDTO } from './dto/login.dto';
 import * as bcrypt from 'bcrypt';
@@ -22,6 +22,7 @@ export class AuthService {
   constructor(
     private readonly configService: ConfigService,
     private readonly customerRepository: CustomerRepository,
+    private readonly userRepository: UserRepository,
     private readonly jwtService: JwtService,
   ) {
     this.googleClient = new OAuth2Client(this.configService.get('google_id'));
@@ -62,7 +63,7 @@ export class AuthService {
   }
 
   async login(loginDTO: LoginDTO) {
-    const customerExist = await this.customerRepository.getOne({
+    const customerExist = await this.userRepository.getOne({
       email: loginDTO.email,
     });
     const match = await bcrypt.compare(

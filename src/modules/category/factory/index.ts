@@ -17,9 +17,10 @@ export class CategoryFactoryService {
       trim: true,
     });
     category.createdBy = user._id;
+    category.updatedBy = user._id;
     return category;
   }
-  async updateCategory(id: string, updateCategoryDto: UpdateCategoryDto) {
+  async updateCategory(id: string, updateCategoryDto: UpdateCategoryDto, user: any) {
     const oldCategory = await this.categoryRepository.getOne({ _id: id });
     if (!oldCategory) throw new NotFoundException('Category Not Found');
     const category = new Category();
@@ -30,6 +31,7 @@ export class CategoryFactoryService {
       lower: true,
       trim: true,
     });
+    category.updatedBy = user._id;
     return category;
   }
 }
