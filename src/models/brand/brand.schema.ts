@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { SchemaTypes, Types } from 'mongoose';
+import { SchemaTypes, Types } from 'mongoose';
 
 @Schema({ timestamps: true })
 export class Brand {
@@ -10,7 +10,7 @@ export class Brand {
   slug: string;
   @Prop({ type: SchemaTypes.ObjectId, ref: 'Admin', required: true })
   createdBy: Types.ObjectId;
-  @Prop({ type: SchemaTypes.ObjectId, ref: 'Admin', required: true })
+  @Prop({ type: Types.ObjectId, ref: 'Admin', required: true })
   updatedBy: Types.ObjectId;
 }
 
