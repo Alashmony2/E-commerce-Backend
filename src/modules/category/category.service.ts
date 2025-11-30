@@ -17,8 +17,8 @@ export class CategoryService {
     return await this.categoryRepository.create(category);
   }
 
-  findAll() {
-    return `This action returns all category`;
+  findAll(query: any) {
+    this.categoryRepository.getAll({}, {}, {}, query);
   }
 
   async findOne(id: string) {
