@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { CreateBrandDto } from './dto/create-brand.dto';
 import { UpdateBrandDto } from './dto/update-brand.dto';
+import { Brand } from './entities/brand.entity';
+import { BrandRepository } from './../../models/brand/brand.repository';
 
 @Injectable()
 export class BrandService {
-  create(createBrandDto: CreateBrandDto) {
-    return 'This action adds a new brand';
-  }
+  constructor(private readonly brandRepository: BrandRepository) {}
+  create(brand: Brand) {}
 
   findAll() {
     return `This action returns all brand`;

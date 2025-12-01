@@ -1,11 +1,12 @@
+import { Auth, User } from '@common/decorators';
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Patch,
+  Post
 } from '@nestjs/common';
 import { BrandService } from './brand.service';
 import { CreateBrandDto } from './dto/create-brand.dto';
@@ -13,6 +14,7 @@ import { UpdateBrandDto } from './dto/update-brand.dto';
 import { BrandFactoryService } from './factory/brand.factory';
 
 @Controller('brand')
+@Auth(['Admin'])
 export class BrandController {
   constructor(
     private readonly brandService: BrandService,
@@ -20,7 +22,10 @@ export class BrandController {
   ) {}
 
   @Post()
-  create(@Body() createBrandDto: CreateBrandDto) {}
+  create(@Body() createBrandDto: CreateBrandDto,@User() user:any) {
+    const brand = this.brandFactoryService.createBrand(createBrandDto,user);
+    this.brandService.create(brand);
+  }
 
   @Get()
   findAll() {
